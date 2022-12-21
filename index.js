@@ -1,43 +1,36 @@
-const masterDiv = document.querySelector('div#choose')
-const currSearch = document.querySelector('search-bar')
-const from = document.querySelector('input#from')
-const to = document.querySelector('input#to')
-// currSearch.addEventListener('submit',(e) => {
-//   e.preventDefault()
-//   const fromval = from.value
-//   const toVal = to.value
-// })
-function myFetch(){
-const options = {
-	method: 'GET',
-	headers: {
-		'X-RapidAPI-Key': '9875652ae1msh37837c1b985fbc1p1a8f8ajsn2f01cc8bca06',
-		'X-RapidAPI-Host': 'currency-conversion-and-exchange-rates.p.rapidapi.com'
-	}
-};
+const select = document.querySelectorAll(".currency");
+const btn = document.getElementById("btn");
+const num = document.getElementById("num");
+const ans = document.getElementById("ans");
+fetch("https://api.frankfurter.app/currencies")
+  .then((data) => data.json())
+  .then((data) => {
+    renderDropdown(data);
+  });
+function renderDropdown(data) {
+  const entries = Object.entries(data);
+  for (let i = 0; i < entries.length; i++) {
+    select[0].innerHTML += `<option value="${entries[i][0]}">${entries[i][0]}</option>`;
+    select[1].innerHTML += `<option value="${entries[i][0]}">${entries[i][0]}</option>`;
+  }
+}
+btn.addEventListener("click", () => {
+  let currency1 = select[0].value;
+  let currency2 = select[1].value;
+  let value = num.value;
 
-fetch('https://currency-conversion-and-exchange-rates.p.rapidapi.com/latest?from=USD&to=EUR%2CGBP', options)
-	.then(response => response.json())
-  .then(currency => currencyList(currency))
-	.catch(err => console.error(err));   
+  if (currency1 != currency2) {
+    convert(currency1, currency2, value);
+  } else {
+    alert("Please Choose Different Currencies !!!");
+  }
+});
+function convert(currency1, currency2, value) {
+  const host = "api.frankfurter.app";
+  fetch(`https://${host}/latest?amount=${value}&from=${currency1}&to=${currency2}`)
+    .then((val) => val.json())
+    .then((val) => {
+      console.log(Object.values(val.rates)[0]);
+      ans.value = Object.values(val.rates)[0];
+    });
 }
-function renderDom(){
-  const myDiv = document.createElement('div')
-  myDiv.className = 'my-div'
-  myDiv.innerHTML =`
-  <div id="search">
-  <form id='search-bar'>
-      <label for="membership">Convert From:</label>
-      <input id='from' type='text' name='search'>
-      <input type='submit' name='submit'/>
-      <label for="membership">Convert to:</label>
-      <input id='to' type='text' name='search'>
-      <input type='submit' name='submit'/>
-    </form>
-  </div> 
-  `
-  masterDiv.appendChild(myDiv)
-}
-renderDom()
-myFetch()
-    masterDiv.addEventListener('click', (e) => console.log(e.target))
